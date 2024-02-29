@@ -1,6 +1,9 @@
-
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <stdlib.h> // EXIT RETURN MESSAGES
+#include <unistd.h> // getopt
+#include <stdio.h>
+/*
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
 #include <fsort.h>
 #include <iostream>
@@ -15,14 +18,14 @@
 using namespace std;
 using namespace cv;
 
-typedef enum {None=0, Simple, Mean} borderType;
+typedef enum {None=0, Simple, Mean} borderType;*/
 
 /**
 \fn void printMaxMin(Mat &M)
 \brief This function print a matrix channels minimum and maximum values.
 \param Mat &M The matris where the values are obtained.
 **/
-void printMaxMin(Mat &M)
+/*void printMaxMin(Mat &M)
 {
     vector <Mat> Channels;
 
@@ -41,7 +44,8 @@ void printMaxMin(Mat &M)
 \struct Clusters
 \brief A public class which stores the clusters states 
 */
-struct Clusters 
+
+/*struct Clusters 
 {
     int S; ///< The grid separation space.
 
@@ -65,7 +69,7 @@ struct Clusters
     \param int s The grid separation space
     \param m Weight that control the contribution of the spatial and color distances in distance used.
     */
-    Clusters (Mat &I, int s, float m)
+/*    Clusters (Mat &I, int s, float m)
     {
         S = s;
         mS2 = m*m/(S*S);
@@ -87,7 +91,7 @@ struct Clusters
     \param Mat &I The matrix that contains the image to be processed.
 
     */
-    void initPixels(Mat &I)
+/*    void initPixels(Mat &I)
     {
         int i, j, k, l;
         int nC, nR, x, y;
@@ -117,7 +121,7 @@ struct Clusters
     \param int x, y The region center coordinates
     \param float &lm, &a, &b the returned CIE-lab color vector components.
     */
-    void getMeanColor (Mat &I, int x, int y, float &l, float &a, float &b)
+/*    void getMeanColor (Mat &I, int x, int y, float &l, float &a, float &b)
     {
         Vec3f acum, *apui;
         int i, j, N, colLeft, colRight, rowUp, rowBottom;
@@ -145,7 +149,7 @@ struct Clusters
     \param Mat &I The matrix that contains the image to be processed.
     \param int &x, &y the 3x3 region coordinat center. The minimum gradient coordinate on the way out.
     */
-    void getCoorMinGradient(Mat &I, int &x, int &y)
+/*    void getCoorMinGradient(Mat &I, int &x, int &y)
     {
         int i, j, xmin, ymin, sz1;
         float g, gmin, G[9], *apug;
@@ -192,7 +196,7 @@ struct Clusters
     \param Vec3f &lab A CIElab vector.
     \param int x, y a coordinate.
     */
-    float Distance(Vec<float, 5> &C, Vec3f &lab, int y, int x)
+/*    float Distance(Vec<float, 5> &C, Vec3f &lab, int y, int x)
     {
         register float tmp, acum, acum2;
 
@@ -509,18 +513,48 @@ struct Clusters
         rowBottom = y + S <= sz.height ? y + S : sz.height;
     }
 };
+*/
+void uso(char* programa){
+	fprintf(stderr, "Uso: %s [-s VALOR] [-m VALOR] [-b VALOR] Archivo\n\n\t-s VALOR: Separacion del grid\n\t-m VALOR: Valor de podenracion entre la distancia en el espacio de color y la distancia en la imagen\n\t-b VALOR: Si el parametro es igual a b, se dibuja el borde, si se omite es diferente de b, no se dibuja el borde.\n\n\tValores por defecto: s=10, m=8\n", programa);
+}
 
 int main(int argc, char **argv)
 {
-    Mat frame, fFrame, gFrame, labFrame, qframe, slicFrame;
-    Mat Out;
+    //Mat frame, fFrame, gFrame, labFrame, qframe, slicFrame;
+    //Mat Out;
     double iFact = 1. / 255.;
     int S;
     float m;
-    Mosaic M;
-    borderType border = None;
+    //Mosaic M;
+    //borderType border = None;
+    bool verboseFlag = false;
     
-    if (argc < 2)
+    
+    int c;
+    while((c = getopt(argc, argv, "s:m:b:v")) != -1){
+    	switch(c){
+    		case 's':
+    			S = atoi(optarg);
+    			break;
+    		case 'm':
+    			m = strtof(optarg, NULL);
+    			break;
+    		case 'b':
+    			break;
+    		case 'v':
+    			verboseFlag = true;
+    			break;
+    		default:    	
+				uso(argv[0]);
+    	}
+    }
+    if(!argv[optind]){
+    	fprintf(stderr, "¡Se esperaba un nombre de archivo!\n");
+    	uso(argv[0]);
+    	exit(EXIT_FAILURE);
+    }
+    
+    /*if (argc < 2)
     {
         cerr << "Faltan Parámetros." << endl
              << "Uso: SLIC Archivo [S] [m] [b]" << endl << endl
@@ -557,15 +591,16 @@ int main(int argc, char **argv)
         S = 8;
         m = 10.;
     }
-    frame = imread(argv[1], 1);
+    
+    */
+/*    frame = imread(argv[1], 1);
     frame.convertTo (fFrame, CV_32FC3);
     //Es necesario normalizar la image BGR al intervalo [0,1] antes de convertir a espacio CIE Lab; en este caso iFact = 1./255
     fFrame *= iFact;
 
     cvtColor (fFrame, labFrame, COLOR_BGR2Lab);
-#ifdef VERBOSE
-    printMaxMin(labFrame);
-#endif
+	if(verboseFlag)
+	    printMaxMin(labFrame);
     
     Clusters superPixels(labFrame, S, m);
 
@@ -590,17 +625,16 @@ int main(int argc, char **argv)
             Out.convertTo (Out, CV_8UC3);
             break;
     }
-#ifdef VERBOSE
-    superPixels.printInfoClusters();
-#endif
-
+	if(verboseFlag)
+    	superPixels.printInfoClusters();
+*/
 
  /*   if (frame.cols > frame.rows)
         M.init(Size(frame.cols, frame.rows), 2, 1, 8, 8, CV_8UC3);
     else
         M.init(Size(frame.cols, frame.rows), 1, 2, 8, 8, CV_8UC3);
 */
-    M.init(Size(frame.cols, frame.rows), 1, 1, 8, 8, CV_8UC3);
+/*    M.init(Size(frame.cols, frame.rows), 1, 1, 8, 8, CV_8UC3);
 
     //Abrimos las ventanas para mostrar los resultados.
     namedWindow( "Mosaico", 1 );
@@ -614,7 +648,7 @@ int main(int argc, char **argv)
     else
         M.setFigure(Out, 0, 1);
 */
-    M.setFigure(Out, 0, 0);
+/*    M.setFigure(Out, 0, 0);
     imwrite ("SLIC.png", Out);
 
     M.show("Mosaico");
@@ -623,6 +657,6 @@ int main(int argc, char **argv)
           
     //Cierra ventanas que fueron abiertas.
     destroyWindow ("Mosaico");
-
-    return 0;
+*/
+    exit(EXIT_SUCCESS);
 }
