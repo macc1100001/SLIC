@@ -18,6 +18,7 @@
 /*
 	TODO:
 	valgrind shows multiple errors about memory	
+	FIX IT!
 */
 
 using namespace std;
@@ -524,7 +525,7 @@ struct Clusters
 };
 
 void uso(char* programa){
-	fprintf(stderr, "Uso: %s [-s VALOR] [-m VALOR] [-b VALOR] Archivo\n\n\t-s VALOR: Separacion del grid\n\t-m VALOR: Valor de podenracion entre la distancia en el espacio de color y la distancia en la imagen\n\t-b VALOR: Si el parametro es igual a b, se dibuja el borde, si se omite es diferente de b, no se dibuja el borde.\n\n\tValores por defecto: s=10, m=8\n", programa);
+	fprintf(stderr, "Uso: %s [-s VALOR] [-m VALOR] [-b VALOR] Archivo\n\n\t-s VALOR: Separacion del grid\n\t-m VALOR: Valor de podenracion entre la distancia en el espacio de color y la distancia en la imagen\n\t-b VALOR: Si el parametro es igual a b, se dibuja el borde, si se omite es diferente de b, no se dibuja el borde.\n\n\tValores por defecto: s = 10, m = 8\n", programa);
 }
 
 int main(int argc, char **argv)
@@ -539,15 +540,13 @@ int main(int argc, char **argv)
     
     
     int c;
-    while((c = getopt(argc, argv, "s:m:b:vSM")) != -1){
+    while((c = getopt(argc, argv, "s:m:vSM")) != -1){
     	switch(c){
     		case 's':
     			S = atoi(optarg);
     			break;
     		case 'm':
     			m = strtof(optarg, NULL);
-    			break;
-    		case 'b':
     			break;
 			case 'S':
 				border = Simple;
@@ -569,46 +568,6 @@ int main(int argc, char **argv)
     	exit(EXIT_FAILURE);
     }
     
-    /*if (argc < 2)
-    {
-        cerr << "Faltan Parámetros." << endl
-             << "Uso: SLIC Archivo [S] [m] [b]" << endl << endl
-             << "donde:" << endl << "\tS: Separacion del grid"
-             << endl << "\tm: valor de ponderación entre la distancia" << endl
-             << "\t    en el espacio de color y la distancia en la imagen."
-             << endl << "\tb: si el parametro es igual a b, se dibuja el borde," << endl
-             << "\t    si se omite o es diferente de b, no se dibuja el borde."
-             << endl << endl
-             << "\tValores por defecto: S=10, m=8" << endl << endl;
-        exit(1);
-    }
-    if (argc>2)
-    {
-        S= atoi(argv[2]);
-        if (argc > 3)
-        {
-            m = atof(argv[3]);
-            if (argc >4)
-                switch ( toupper(argv[4][0]))
-                {
-                    case 'S': border = Simple;
-                            break;
-                    case 'M': border = Mean;
-                            break;
-                    default: border = None;
-                }
-        }
-        else
-            m = 10.;
-    }
-    else
-    {
-        S = 8;
-        m = 10.;
-    }
-    
-    */
-    //frame = imread(argv[1], 1);
     frame = imread(argv[optind], 1);
     frame.convertTo (fFrame, CV_32FC3);
     //Es necesario normalizar la image BGR al intervalo [0,1] antes de convertir a espacio CIE Lab; en este caso iFact = 1./255
@@ -657,17 +616,6 @@ int main(int argc, char **argv)
 
     //Despliega la imagen capturada en una ventana y conviertela a 
     //una respresentacion de dobles.
-    //M.setFigure(frame, 0, 0);
-
-	/*
-    if (frame.cols > frame.rows)
-        M.setFigure(Out, 1, 0);
-    else{
-    	printf("Culpable 2\n");
-        M.setFigure(Out, 0, 1);
-    }
-    */
-
     M.setFigure(Out, 0, 0);
     imwrite ("SLIC.png", Out);
 
@@ -675,8 +623,8 @@ int main(int argc, char **argv)
 
     waitKeyEx( 0 );
           
-    //Cierra ventanas que fueron abiertas.
-    //destroyWindow ("Mosaico");
+    frame.release(); fFrame.release(); gFrame.release(); labFrame.release(); qframe.release(); slicFrame.release();
+    Out.release();
 
     exit(EXIT_SUCCESS);
 }

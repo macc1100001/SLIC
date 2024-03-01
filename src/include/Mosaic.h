@@ -64,8 +64,8 @@ class Mosaic
         rows = figSize.height * fRows + vSep * (fRows + 1);
         cols = figSize.width * fCols + hSep * (fCols + 1);
         frame = Mat::ones (rows, cols, type) * 255;
-        figures = new Mat *[fRows];
-        figures[0] = new Mat [fRows * fCols];
+        figures = new Mat *[fRows]; // need to free this!
+        figures[0] = new Mat [fRows * fCols]; // neet to free this!
         for (int i=1;i < fRows;++i)
             figures[i] = &(figures[0][i * fCols]);
 
@@ -82,7 +82,7 @@ class Mosaic
 
     Mosaic()
     {
-        figures = 0;
+        figures = NULL; // ??
         fRows = fCols = 0;
         vSep = hSep = 0;
     }
@@ -173,6 +173,11 @@ class Mosaic
     {
         
         cv::imshow(name, frame);
+    }
+    
+    ~Mosaic(){
+    	delete figures[0]; // ?
+    	delete[] figures;
     }
 };
 

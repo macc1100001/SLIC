@@ -24,7 +24,7 @@ struct stack
         if (sz > 0)
             S = new coor[sz];
         else
-            S = 0;
+            S = NULL;
     }
     ~stack()
     {
