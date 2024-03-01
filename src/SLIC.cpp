@@ -25,6 +25,8 @@ using namespace cv;
 
 typedef enum {None=0, Simple, Mean} borderType;
 
+bool verboseFlag = false;
+
 /**
 \fn void printMaxMin(Mat &M)
 \brief This function print a matrix channels minimum and maximum values.
@@ -201,7 +203,7 @@ struct Clusters
     \param Vec3f &lab A CIElab vector.
     \param int x, y a coordinate.
     */
-    float Distance(Vec<float, 5> &C, Vec3f &lab, int y, int x)
+    float Distance(const Vec<float, 5> &C, const Vec3f &lab, int y, int x)
     {
         float tmp, acum, acum2;
 
@@ -256,7 +258,8 @@ struct Clusters
 
             //Compute new Cluster Centers.
             E = computeCentroids(I);
-            cout << "Iteration: " << cont << " ResidualError: " << E << endl;
+            if(verboseFlag)
+            	cout << "Iteration: " << cont << " ResidualError: " << E << endl;
             cont++;
         } while (E > threshold && cont < 100);
         reConnect();
@@ -291,7 +294,7 @@ struct Clusters
                  << (*apuI)[0] << ", "
                  << (*apuI)[1] << "]" << endl;
         }
-        cout << endl;
+        //cout << endl;
     }
 
     float computeCentroids(Mat &I)
@@ -350,7 +353,7 @@ struct Clusters
 
     void drawImage(Mat &I)
     {
-        int i, j;
+	    int i, j;
         Vec <float, 5> *apuC;
         int *apul;
         float *apuf, *apuc;
@@ -506,7 +509,8 @@ struct Clusters
                 }
             }
         }
-        cout << orphIdx  << " orphaned pixel were found" << endl;
+        if(verboseFlag)
+        	cout << orphIdx  << " orphaned pixel were found" << endl;
     }
 
     void setRegionLimits(int x, int y, int S, Size sz,  int &rowUp, int &rowBottom, int &colLeft, int &colRight)
@@ -532,7 +536,6 @@ int main(int argc, char **argv)
     float m = 8;
     Mosaic M;
     borderType border = None;
-    bool verboseFlag = false;
     
     
     int c;
@@ -611,7 +614,7 @@ int main(int argc, char **argv)
     //Es necesario normalizar la image BGR al intervalo [0,1] antes de convertir a espacio CIE Lab; en este caso iFact = 1./255
     fFrame *= iFact;
 
-    cvtColor (fFrame, labFrame, COLOR_BGR2Lab); // TODO: valgrind shows error here
+    cvtColor (fFrame, labFrame, COLOR_BGR2Lab); // TODO: valgrind shows here
 	if(verboseFlag)
 	    printMaxMin(labFrame);
     
@@ -656,10 +659,14 @@ int main(int argc, char **argv)
     //una respresentacion de dobles.
     //M.setFigure(frame, 0, 0);
 
+	/*
     if (frame.cols > frame.rows)
         M.setFigure(Out, 1, 0);
-    else
+    else{
+    	printf("Culpable 2\n");
         M.setFigure(Out, 0, 1);
+    }
+    */
 
     M.setFigure(Out, 0, 0);
     imwrite ("SLIC.png", Out);
