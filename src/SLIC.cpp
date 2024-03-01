@@ -1,9 +1,9 @@
 #include <stdlib.h> // EXIT RETURN MESSAGES
 #include <unistd.h> // getopt
-#include <stdio.h>
-/*
+#include <stdio.h>	// maybe not needed if cout is used, change later
+
 #include <opencv2/opencv.hpp>
-#include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/highgui/highgui.hpp> // not needed, included by Mosaic.h
 
 #include <fsort.h>
 #include <iostream>
@@ -15,17 +15,22 @@
 #include <countNeighbours.h>
 #include <trackBorder.h>
 
+/*
+	TODO:
+	valgrind shows multiple errors about memory	
+*/
+
 using namespace std;
 using namespace cv;
 
-typedef enum {None=0, Simple, Mean} borderType;*/
+typedef enum {None=0, Simple, Mean} borderType;
 
 /**
 \fn void printMaxMin(Mat &M)
 \brief This function print a matrix channels minimum and maximum values.
 \param Mat &M The matris where the values are obtained.
 **/
-/*void printMaxMin(Mat &M)
+void printMaxMin(Mat &M)
 {
     vector <Mat> Channels;
 
@@ -45,7 +50,7 @@ typedef enum {None=0, Simple, Mean} borderType;*/
 \brief A public class which stores the clusters states 
 */
 
-/*struct Clusters 
+struct Clusters 
 {
     int S; ///< The grid separation space.
 
@@ -69,7 +74,7 @@ typedef enum {None=0, Simple, Mean} borderType;*/
     \param int s The grid separation space
     \param m Weight that control the contribution of the spatial and color distances in distance used.
     */
-/*    Clusters (Mat &I, int s, float m)
+    Clusters (Mat &I, int s, float m)
     {
         S = s;
         mS2 = m*m/(S*S);
@@ -91,7 +96,7 @@ typedef enum {None=0, Simple, Mean} borderType;*/
     \param Mat &I The matrix that contains the image to be processed.
 
     */
-/*    void initPixels(Mat &I)
+    void initPixels(Mat &I)
     {
         int i, j, k, l;
         int nC, nR, x, y;
@@ -121,7 +126,7 @@ typedef enum {None=0, Simple, Mean} borderType;*/
     \param int x, y The region center coordinates
     \param float &lm, &a, &b the returned CIE-lab color vector components.
     */
-/*    void getMeanColor (Mat &I, int x, int y, float &l, float &a, float &b)
+    void getMeanColor (Mat &I, int x, int y, float &l, float &a, float &b)
     {
         Vec3f acum, *apui;
         int i, j, N, colLeft, colRight, rowUp, rowBottom;
@@ -149,7 +154,7 @@ typedef enum {None=0, Simple, Mean} borderType;*/
     \param Mat &I The matrix that contains the image to be processed.
     \param int &x, &y the 3x3 region coordinat center. The minimum gradient coordinate on the way out.
     */
-/*    void getCoorMinGradient(Mat &I, int &x, int &y)
+    void getCoorMinGradient(Mat &I, int &x, int &y)
     {
         int i, j, xmin, ymin, sz1;
         float g, gmin, G[9], *apug;
@@ -196,9 +201,9 @@ typedef enum {None=0, Simple, Mean} borderType;*/
     \param Vec3f &lab A CIElab vector.
     \param int x, y a coordinate.
     */
-/*    float Distance(Vec<float, 5> &C, Vec3f &lab, int y, int x)
+    float Distance(Vec<float, 5> &C, Vec3f &lab, int y, int x)
     {
-        register float tmp, acum, acum2;
+        float tmp, acum, acum2;
 
         tmp = lab[0]-C[0];
         acum = tmp*tmp;
@@ -513,25 +518,25 @@ typedef enum {None=0, Simple, Mean} borderType;*/
         rowBottom = y + S <= sz.height ? y + S : sz.height;
     }
 };
-*/
+
 void uso(char* programa){
 	fprintf(stderr, "Uso: %s [-s VALOR] [-m VALOR] [-b VALOR] Archivo\n\n\t-s VALOR: Separacion del grid\n\t-m VALOR: Valor de podenracion entre la distancia en el espacio de color y la distancia en la imagen\n\t-b VALOR: Si el parametro es igual a b, se dibuja el borde, si se omite es diferente de b, no se dibuja el borde.\n\n\tValores por defecto: s=10, m=8\n", programa);
 }
 
 int main(int argc, char **argv)
 {
-    //Mat frame, fFrame, gFrame, labFrame, qframe, slicFrame;
-    //Mat Out;
+    Mat frame, fFrame, gFrame, labFrame, qframe, slicFrame;
+    Mat Out;
     double iFact = 1. / 255.;
-    int S;
-    float m;
-    //Mosaic M;
-    //borderType border = None;
+    int S = 10;
+    float m = 8;
+    Mosaic M;
+    borderType border = None;
     bool verboseFlag = false;
     
     
     int c;
-    while((c = getopt(argc, argv, "s:m:b:v")) != -1){
+    while((c = getopt(argc, argv, "s:m:b:vSM")) != -1){
     	switch(c){
     		case 's':
     			S = atoi(optarg);
@@ -541,11 +546,18 @@ int main(int argc, char **argv)
     			break;
     		case 'b':
     			break;
+			case 'S':
+				border = Simple;
+				break;
+			case 'M':
+				border = Mean;
+				break;
     		case 'v':
     			verboseFlag = true;
     			break;
     		default:    	
 				uso(argv[0]);
+				exit(EXIT_FAILURE);
     	}
     }
     if(!argv[optind]){
@@ -593,19 +605,20 @@ int main(int argc, char **argv)
     }
     
     */
-/*    frame = imread(argv[1], 1);
+    //frame = imread(argv[1], 1);
+    frame = imread(argv[optind], 1);
     frame.convertTo (fFrame, CV_32FC3);
     //Es necesario normalizar la image BGR al intervalo [0,1] antes de convertir a espacio CIE Lab; en este caso iFact = 1./255
     fFrame *= iFact;
 
-    cvtColor (fFrame, labFrame, COLOR_BGR2Lab);
+    cvtColor (fFrame, labFrame, COLOR_BGR2Lab); // TODO: valgrind shows error here
 	if(verboseFlag)
 	    printMaxMin(labFrame);
     
     Clusters superPixels(labFrame, S, m);
 
     superPixels.segment(labFrame);
-    superPixels.drawImage(slicFrame);
+    superPixels.drawImage(slicFrame); // TODO: valgrind shows error here
     switch(border)
     {
         case Mean:
@@ -627,14 +640,14 @@ int main(int argc, char **argv)
     }
 	if(verboseFlag)
     	superPixels.printInfoClusters();
-*/
 
- /*   if (frame.cols > frame.rows)
+
+   if (frame.cols > frame.rows)
         M.init(Size(frame.cols, frame.rows), 2, 1, 8, 8, CV_8UC3);
     else
         M.init(Size(frame.cols, frame.rows), 1, 2, 8, 8, CV_8UC3);
-*/
-/*    M.init(Size(frame.cols, frame.rows), 1, 1, 8, 8, CV_8UC3);
+
+    M.init(Size(frame.cols, frame.rows), 1, 1, 8, 8, CV_8UC3);
 
     //Abrimos las ventanas para mostrar los resultados.
     namedWindow( "Mosaico", 1 );
@@ -643,12 +656,12 @@ int main(int argc, char **argv)
     //una respresentacion de dobles.
     //M.setFigure(frame, 0, 0);
 
-  /*  if (frame.cols > frame.rows)
+    if (frame.cols > frame.rows)
         M.setFigure(Out, 1, 0);
     else
         M.setFigure(Out, 0, 1);
-*/
-/*    M.setFigure(Out, 0, 0);
+
+    M.setFigure(Out, 0, 0);
     imwrite ("SLIC.png", Out);
 
     M.show("Mosaico");
@@ -656,7 +669,7 @@ int main(int argc, char **argv)
     waitKeyEx( 0 );
           
     //Cierra ventanas que fueron abiertas.
-    destroyWindow ("Mosaico");
-*/
+    //destroyWindow ("Mosaico");
+
     exit(EXIT_SUCCESS);
 }

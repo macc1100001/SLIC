@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Wextra `pkg-config opencv4 --cflags`
+CFLAGS = -Wall -Wextra -Isrc/include `pkg-config opencv4 --cflags`
 DEBUG = 1
 LDFLAGS = `pkg-config opencv4 --libs`
 EXEC = slic
