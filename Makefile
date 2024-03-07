@@ -22,9 +22,12 @@ $(EXEC): $(OBJS)
     
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CC) -o $@ -c $(CFLAGS) $^
+	
+test: $(OBJDIR)/test.o
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-test: $(SRCDIR)/testCountNeighbours.cpp
-	$(CC) -o $@ $(CFLAGS) $(LDFLAGS) $^
+$(OBJDIR)/test.o: $(SRCDIR)/testCountNeighbours.cpp
+	$(CC) -o $@ -c $(CFLAGS) $^
 	
 .PHONY: clean cleanest init
 
