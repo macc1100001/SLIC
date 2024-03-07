@@ -1,6 +1,6 @@
-#include <stdlib.h> // EXIT RETURN MESSAGES
+#include <cstdlib> // EXIT RETURN MESSAGES
 #include <unistd.h> // getopt
-#include <stdio.h>	// maybe not needed if cout is used, change later
+//#include <stdio.h>	// maybe not needed if cout is used, change later
 
 #include <opencv2/opencv.hpp>
 //#include <opencv2/highgui/highgui.hpp> // not needed, included by Mosaic.h
@@ -525,7 +525,14 @@ struct Clusters
 };
 
 void uso(char* programa){
-	fprintf(stderr, "Uso: %s [-s VALOR] [-m VALOR] [-b VALOR] Archivo\n\n\t-s VALOR: Separacion del grid\n\t-m VALOR: Valor de podenracion entre la distancia en el espacio de color y la distancia en la imagen\n\t-b VALOR: Si el parametro es igual a b, se dibuja el borde, si se omite es diferente de b, no se dibuja el borde.\n\n\tValores por defecto: s = 10, m = 8\n", programa);
+	fprintf(stderr, "Uso: %s [ -s VALOR ] [ -m VALOR ] [ -S / -M ] Archivo\n\
+	-s VALOR: Separacion del grid\n\
+	-m VALOR: Valor de ponderacion entre la distancia en el espacio de color y la distancia en la imagen\n\
+	-S: Se dibuja el borde usando un borde simple.\n\
+	-M: Se dibuja el borde usando el promedio.\n\
+	-v Verbose\n\
+	-h Muestra esta lista de ayuda.\n\
+	Valores por defecto: s = 10, m = 8\n", programa);
 }
 
 int main(int argc, char **argv)
@@ -540,7 +547,7 @@ int main(int argc, char **argv)
     
     
     int c;
-    while((c = getopt(argc, argv, "s:m:vSM")) != -1){
+    while((c = getopt(argc, argv, "s:m:vSMh")) != -1){
     	switch(c){
     		case 's':
     			S = atoi(optarg);
@@ -557,6 +564,7 @@ int main(int argc, char **argv)
     		case 'v':
     			verboseFlag = true;
     			break;
+			case 'h':
     		default:    	
 				uso(argv[0]);
 				exit(EXIT_FAILURE);
@@ -623,8 +631,10 @@ int main(int argc, char **argv)
 
     waitKeyEx( 0 );
           
-    frame.release(); fFrame.release(); gFrame.release(); labFrame.release(); qframe.release(); slicFrame.release();
+    frame.release(); fFrame.release(); gFrame.release(); labFrame.release(); qframe.release();
+    slicFrame.release();
     Out.release();
+    
 
     exit(EXIT_SUCCESS);
 }
