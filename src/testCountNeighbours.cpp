@@ -1,5 +1,5 @@
-#include "opencv2/opencv.hpp"
-#include "opencv2/highgui/highgui.hpp"
+#include <opencv2/opencv.hpp>
+#include <opencv2/highgui.hpp>
 #include <fsort.h>
 #include <iostream>
 #include <countNeighbours.h>
@@ -8,7 +8,7 @@ using namespace std;
 using namespace cv;
 
 
-int main(int argc, char **argv)
+int main(void)
 {
     Mat M;
 
